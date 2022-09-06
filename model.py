@@ -1,6 +1,6 @@
 import itertools
 import functools
-
+from dataloader_utils import init_dhcp_dataloader
 import os
 import torch
 from torch import nn
@@ -20,12 +20,12 @@ class cycleGAN(object):
 
         # Define the network 
         #####################################################
-        self.Gab = define_Gen(input_nc=3, output_nc=3, ngf=args.ngf, netG=args.gen_net, norm=args.norm, 
+        self.Gab = define_Gen(input_nc=1, output_nc=1, ngf=args.ngf, netG=args.gen_net, norm=args.norm, 
                                                     use_dropout= not args.no_dropout, gpu_ids=args.gpu_ids)
-        self.Gba = define_Gen(input_nc=3, output_nc=3, ngf=args.ngf, netG=args.gen_net, norm=args.norm, 
+        self.Gba = define_Gen(input_nc=1, output_nc=1, ngf=args.ngf, netG=args.gen_net, norm=args.norm, 
                                                     use_dropout= not args.no_dropout, gpu_ids=args.gpu_ids)
-        self.Da = define_Dis(input_nc=3, ndf=args.ndf, netD= args.dis_net, n_layers_D=3, norm=args.norm, gpu_ids=args.gpu_ids)
-        self.Db = define_Dis(input_nc=3, ndf=args.ndf, netD= args.dis_net, n_layers_D=3, norm=args.norm, gpu_ids=args.gpu_ids)
+        self.Da = define_Dis(input_nc=1, ndf=args.ndf, netD= args.dis_net, n_layers_D=3, norm=args.norm, gpu_ids=args.gpu_ids)
+        self.Db = define_Dis(input_nc=1, ndf=args.ndf, netD= args.dis_net, n_layers_D=3, norm=args.norm, gpu_ids=args.gpu_ids)
 
         utils.print_networks([self.Gab,self.Gba,self.Da,self.Db], ['Gab','Gba','Da','Db'])
 
@@ -65,20 +65,23 @@ class cycleGAN(object):
 
     def train(self,args):
         # For transforming the input image
-        transform = transforms.Compose(
-            [transforms.RandomHorizontalFlip(),
-             transforms.Resize((args.load_height,args.load_width)),
-             transforms.RandomCrop((args.crop_height,args.crop_width)),
-             transforms.ToTensor(),
-             transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])])
+        # transform = transforms.Compose(
+        #     [transforms.RandomHorizontalFlip(),
+        #      transforms.Resize((args.load_height,args.load_width)),
+        #      transforms.RandomCrop((args.crop_height,args.crop_width)),
+        #      transforms.ToTensor(),
+        #      transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])])
 
-        dataset_dirs = utils.get_traindata_link(args.dataset_dir)
+        #dataset_dirs = utils.get_traindata_link(args.dataset_dir)
 
         # Pytorch dataloader
-        a_loader = torch.utils.data.DataLoader(dsets.ImageFolder(dataset_dirs['trainA'], transform=transform), 
-                                                        batch_size=args.batch_size, shuffle=True, num_workers=4)
-        b_loader = torch.utils.data.DataLoader(dsets.ImageFolder(dataset_dirs['trainB'], transform=transform), 
-                                                        batch_size=args.batch_size, shuffle=True, num_workers=4)
+        a_loader, a_loader_val, a_loader_test, b_loader, b_loader_val, b_loader_test = init_dhcp_dataloader(args)
+        
+        # a_loader = torch.utils.data.DataLoader(dsets.ImageFolder(dataset_dirs['trainA'], transform=transform), 
+        #                                                 batch_size=args.batch_size, shuffle=True, num_workers=4)
+        
+        # b_loader = torch.utils.data.DataLoader(dsets.ImageFolder(dataset_dirs['trainB'], transform=transform), 
+        #                                                 batch_size=args.batch_size, shuffle=True, num_workers=4)
 
         a_fake_sample = utils.Sample_from_Pool()
         b_fake_sample = utils.Sample_from_Pool()
@@ -200,6 +203,5 @@ class cycleGAN(object):
             ########################
             self.g_lr_scheduler.step()
             self.d_lr_scheduler.step()
-
 
 
