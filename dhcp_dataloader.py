@@ -81,10 +81,9 @@ class DHCP_2D(torch.utils.data.Dataset):
         if self.transform:
             image = self.transform(image)
             
+        image = resize_pad(image) # added to resize image 256x256    
         # unsqueeze image to add 1st channel 
         image = torch.from_numpy(image.copy()).float()
-        image = resize_pad(image) # added to resize image 256x256
-        print('image size' + str(image.shape))
         image = image.unsqueeze(0)
         
         # to get subject and session name 

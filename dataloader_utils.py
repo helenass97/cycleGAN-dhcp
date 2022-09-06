@@ -391,12 +391,12 @@ def init_dhcp_dataloader(args, shuffle_test=False):
     Initialize both datasets and dataloaders
     image_size = [128, 160, 112]
     '''
-    if (not args.aug_rician_noise == None) or (not args.aug_bspline_deformation == None) or (not args.resize_image == None):
+    if (not args.aug_rician_noise == None) or (not args.aug_bspline_deformation == None) or (not args.resize_image == False): #put as False before was None
         transforms = []
     else:
         transforms = None
 
-    if args.resize_image:
+    if (args.resize_image == True):
         transforms.append(ResizeImage(image_size=args.resize_size))
 
     if args.aug_rician_noise:
