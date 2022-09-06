@@ -6,31 +6,29 @@ import torchvision
 import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 import utils
+from dataloader_utils import init_dhcp_dataloader
 from arch import define_Gen, define_Dis
-
-
-
 
 
 def test(args):
 
-    transform = transforms.Compose(
-        [transforms.Resize((args.crop_height,args.crop_width)),
-         transforms.ToTensor(),
-         transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])])
+    # transform = transforms.Compose(
+    #     [transforms.Resize((args.crop_height,args.crop_width)),
+    #      transforms.ToTensor(),
+    #      transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])])
 
-    dataset_dirs = utils.get_testdata_link(args.dataset_dir)
+    # dataset_dirs = utils.get_testdata_link(args.dataset_dir)
 
-    a_test_data = dsets.ImageFolder(dataset_dirs['testA'], transform=transform)
-    b_test_data = dsets.ImageFolder(dataset_dirs['testB'], transform=transform)
+    # a_test_data = dsets.ImageFolder(dataset_dirs['testA'], transform=transform)
+    # b_test_data = dsets.ImageFolder(dataset_dirs['testB'], transform=transform)
+    # a_test_loader = torch.utils.data.DataLoader(a_test_data, batch_size=args.batch_size, shuffle=True, num_workers=4)
+    # b_test_loader = torch.utils.data.DataLoader(b_test_data, batch_size=args.batch_size, shuffle=True, num_workers=4)
 
+    _, _, a_test_loader, _, _, b_test_loader = init_dhcp_dataloader(args)
 
-    a_test_loader = torch.utils.data.DataLoader(a_test_data, batch_size=args.batch_size, shuffle=True, num_workers=4)
-    b_test_loader = torch.utils.data.DataLoader(b_test_data, batch_size=args.batch_size, shuffle=True, num_workers=4)
-
-    Gab = define_Gen(input_nc=3, output_nc=3, ngf=args.ngf, netG='resnet_9blocks', norm=args.norm, 
+    Gab = define_Gen(input_nc=1, output_nc=1, ngf=args.ngf, netG='resnet_9blocks', norm=args.norm, 
                                                     use_dropout= not args.no_dropout, gpu_ids=args.gpu_ids)
-    Gba = define_Gen(input_nc=3, output_nc=3, ngf=args.ngf, netG='resnet_9blocks', norm=args.norm, 
+    Gba = define_Gen(input_nc=1, output_nc=1, ngf=args.ngf, netG='resnet_9blocks', norm=args.norm, 
                                                     use_dropout= not args.no_dropout, gpu_ids=args.gpu_ids)
 
     utils.print_networks([Gab,Gba], ['Gab','Gba'])
@@ -64,4 +62,3 @@ def test(args):
         os.makedirs(args.results_dir)
 
     torchvision.utils.save_image(pic, args.results_dir+'/sample.jpg', nrow=3)
-

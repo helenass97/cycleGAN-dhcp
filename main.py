@@ -39,7 +39,7 @@ def get_args():
 def main():
   args = get_args()
 
-  create_link(args.dataset_dir)
+  # create_link(args.dataset_dir)
 
   str_ids = args.gpu_ids.split(',')
   args.gpu_ids = []
