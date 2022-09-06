@@ -29,7 +29,7 @@ def get_args():
     parser.add_argument('--dis_net', type=str, default='n_layers')
     parser.add_argument('--aug_rician_noise', type=int, default=0, help='whether to use rician noise augmentation' 'options: 0, ([0, 10])')
     parser.add_argument('--aug_bspline_deformation', type=float, default=0, help='whether to use bspline_deformation' 'options: 0, ([5],[0, 2])')
-    parser.add_argument('--resize_image', type=bool, default=True)
+    parser.add_argument('--resize_image', type=bool, default=False)
     parser.add_argument('--resize_size', type=float, default=(256,256))
         
     args = parser.parse_args()
